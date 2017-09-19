@@ -293,45 +293,7 @@ find_game_players(network, 'The Legend of Corgi')
 
 
 
-# In[109]:
-
-def find_path(network, user_A, user_B, checked = None):
-    ## check that users are in network
-    if user_A and user_B not in network:
-        print "These are not the droids you are looking for."
-        return None
-    
-    ## check for a direct connection:
-    if user_B in network[user_A][category.friends]:
-        print "we found you!"
-        return [user_A, user_B]
-    
-    ## start recursion to hunt for links
-    
-# 😳 THIS IS WHERE I GET CONFUSED
-
-    # start keeping track of whose networks you've looked in already
-    if checked == None:
-        checked = [user_A]
-    
-    for friend in network[user_A]:
-        #determine in the person (and thus their network) has been checked
-        if friend not in checked:
-            # add them to the checked list
-            checked.append(friend)
-            # check their connections
-            find_path(network, friend, user_B)
-        
-    
-        
-
-
-# In[110]:
-
-find_path(network, 'John', 'Olive')
-
-
-# In[101]:
+# In[75]:
 
 # # find_path_to_friend(network, user_A, user_B): 
 # #   Finds a connections path from user_A to user_B. It has to be an existing 
@@ -365,103 +327,90 @@ find_path(network, 'John', 'Olive')
 # #   may safely add default parameters since all calls used in the grading script 
 # #   will only include the arguments network, user_A, and user_B.
 
+
+# In[89]:
+
 def find_path_to_friend(network, user_A, user_B, checked=None):
-    ## test for both users out of network
-    if user_A and user_B not in network:
-        print "not here!"
+    ## check that users are in network
+    if user_A not in network and user_B not in network:
         return None
     
-    ## found in network
+    ## This is the Base Case-- the person is in a direct network
     if user_B in network[user_A][category.friends]:
         return [user_A, user_B]
     
-    ## start the checked library
-    if checked = None:
-        check = [user_A]
+    ## start recursion to hunt for links if it isn't direct
+
+    # init the checked directory, init the path beyond the direct connection
+    if checked == None:
+        checked = [user_A]
         path = []
-        for friend in network[user_A][category.friends]:
-            path += find_path_to_friend(network, user_A, user_B, users_searched)
-        path = path + find_path_to_friend()
-        return path
+    
+    for friend in network[user_A][category.friends]:
+        #determine in the person has been checked
+        if friend not in checked:
+            # add them to the checked list
+            checked.append(friend)
+            # redefine the path to include them later and to continue looking for people
+            path = find_path_to_friend(network, friend, user_B, checked)
+
+            # once the base case is achieved, path will = [last two people in path] and will become TRUE
+            if path:
+                # start returning all the pending FXs, adding in all the peeps
+                return [user_A] + path
+            # this will terminate the program when the final (and first) FX call resolves
+    
+    # just in case the path isn't found at the end of all that work.
     return None
+        
 
 
-# In[25]:
+# In[90]:
+
+find_path_to_friend(network, 'John', 'Lola')
 
 def paths(network, user_A, user_B, checked=None):
-    print "calling function..."
+    print "\n calling function..."
     if user_A not in network and user_B not in network:
         return None
     
     if user_B in network[user_A][category.friends]:
+        print "BASE CASE ACHIEVED"
         return [user_A, user_B]
-    
+
+    # init checked direct
     if checked == None:
         checked = [user_A]
-    
+    print "starting network to look through:", network[user_A][category.friends]
     for person in network[user_A][category.friends]:
+        print "this is the person:", person
         if person not in checked:
             checked.append(person)
+            print "checked:", checked
             path = paths(network, person, user_B, checked)
+            print "*****this is path:", path
             
             if path:
+                print "\n passes if path statement"
                 return [user_A] + path
     return None
-
-
-
-# In[26]:
-
-print paths(network, 'John', 'Levi')
-
-
-# In[27]:
+    
+print paths(network, 'John', 'Lola')
+# In[64]:
 
 def find_all_paths(network, start, search):
-    paths = []
-    result = []
-    
-    depth = len(network)
-    
-    for iteration in range(0, depth):
-        for i in network[start][category.friends]:
-            if i == search:
-                result = [start, i]
-                if result not in paths:
-                    paths.append(result)
-            else:
-                for person in network[i][category.friends]:
-                    if person == search:
-                        result = [start, i, person]
-                        if result not in paths:
-                            paths.append(result)
-                    else:
-                        for friend in network[i][category.friends]:
-                            if friend == search:
-                                result = [start, i, person, friend]
-                                if result not in paths:
-                                    paths.append(result)
+   # code here
     return paths
 
 
-# In[86]:
+# In[65]:
 
-find_all_paths('John', 'Levi')
+find_all_paths(network, 'John', 'Levi')
 
 
-# In[29]:
+# In[63]:
 
 def find_shortest_path(network, start, search):
-    paths = find_all_paths(network, start, search)
-    lengths = {}
-    for path in paths:
-        lengths[(len(path))] = path
-    return lengths[min(lengths.keys())]
-
-
-# In[30]:
-
-find_shortest_path(paths)
 
 
 # In[ ]:
